@@ -10,6 +10,8 @@
     *client-data*
     *client-socket-list*
 
+    :journal
+
     :client-write
     :cline-write-bytes
     :client-broadcast

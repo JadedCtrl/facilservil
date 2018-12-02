@@ -131,6 +131,18 @@ TIP: When it comes to user data, you might want to use a hash-table or two which
 
 
 ----------------------------------------
+NON-FEATURES (TODO)
+----------------------------------------
+
+ * Ctrl-C etc will crash servers
+ * Some UTF characters don't go over well
+ * Internationalization should be supported--
+   right now, logs etc are always in English.
+   Not cool.
+ * You should be able to log to a file.
+
+
+----------------------------------------
 BORING STUFF
 ----------------------------------------
 License is in COPYING (GNU GPLv3)
