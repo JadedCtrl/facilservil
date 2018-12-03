@@ -1,5 +1,5 @@
 (defsystem "facilservil"
-  :version "0.1"
+  :version "0.2"
   :author "Jaidyn Lev <jadedctrl@teknik.io>"
   :license "CC0"
   :depends-on ("usocket" "trivial-utf-8" "alexandria" "nih")

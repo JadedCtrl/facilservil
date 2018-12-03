@@ -1,27 +1,27 @@
 (in-package :facilservil)
 
 ;; -------------------------------------
-;; GLOAL VARIABLES
+;; GLOBAL VARIABLES
 
-(defvar *socket-list* '())
-(defvar *socket-pairs* '())
+(defvar *socket-client* '())
 
 (defvar *client-list* '())
-(defvar *client-socket-list* '())
-(defvar *client-pairs* '())
 (defvar *client-data* '())
 
-(defvar *command-byte* 10)
+(defvar *socket-list* '())
+(defvar *csocket-list* '())
+
 
 
 (defun reset-globals ()
   "Set all global variables to default state."
-  (setq *socket-pairs* (make-hash-table :test 'equal))
-  (setq *client-list* '())
-  (setq *client-socket-list* '())
-  (setq *client-pairs* (make-hash-table :test 'equal))
+  (setq *socket-client* '()) ;; list correlating client IDs and sockets
+
+  (setq *client-list* '())  ;; list of client (ID numbers)
   (setq *client-data* (make-hash-table :test 'equal))
-  (setq *command-byte* 10))
+
+  (setq *socket-list* '())  ;; all sockets
+  (setq *csocket-list* '())) ;; all sockets except for master socket
 
 
 ;; -------------------------------------
@@ -48,9 +48,8 @@
   (let* ((master-socket
 	   (usocket:socket-listen host port
 				  :reuse-address 'T
-				  :element-type '(unsigned-byte 8))))
+				  :element-type 'unsigned-byte )))
     (reset-globals)
-    (setq *command-byte* command-byte)
     (setq *socket-list* (list master-socket))
 
     (unwind-protect
@@ -66,40 +65,37 @@
 	     (let ((new-socket (usocket:socket-accept socket)))
 
 	       ;; add data to client-pairs, socket-pairs, client-data vv
-	       (client-register new-socket) 
+	       (socket-register new-socket)
 
 	       ;; execute user-provided #'connecting ^-^
-	       (let* ((socket-id (make-socket-id new-socket))
-		      (client-id (gethash socket-id *socket-pairs*)))
-		 (funcall connecting new-socket client-id))))
+	       (funcall connecting new-socket (socket-to-client new-socket))))
 
 
 	    ;; ...if functioning old connection...
 	    ((listen (usocket:socket-stream socket))
-	     (progn (client-read socket)
+	     (progn (socket-read socket)
 		    ;; check if command is complete-- if so, use user-provided
 		    ;; input-handler.
-		    (let* ((socket-id (make-socket-id socket))
-			   (client-id (gethash socket-id *socket-pairs*))
-			   (client-input (client-input-string socket)))
+		    (let* ((client-id (socket-to-client socket))
+			   (client-bytes (client-data-get client-id "input"))
+			   (client-input (client-input-string client-id)))
+		      (journal client-input "Client Input")
 
 		      ;; if reached *command-byte*, handle and flush input
-		      (if (commandp socket)
-			(progn (funcall input-handler socket client-id client-input)
-			       (client-input-flush socket))))))
+		      (if (commandp client-bytes command-byte)
+			(progn
+			  (funcall input-handler socket client-id client-input)
+			  (socket-input-flush socket))))))
 
 
 	    ;; ...if EOF connection or error... </3
 	    ('T
-	     (let* ((socket-id (make-socket-id socket))
-		    (client-id (gethash socket-id *socket-pairs*)))
+	     ;; execute user-provided #'disconnecting ;-;
+	     (funcall disconnecting socket (socket-to-client socket))
+	     (socket-slaughter socket))))
 
-	       ;; execute user-provided #'disconnecting ;-;
-	       (funcall disconnecting socket client-id)
-	       (client-slaughter socket))))
-
-	  ;; now, let's write that shit down
-	  (standard-journaling)))
+	;; now, let's write that shit down
+	(standard-journaling))
 
       ;; unwind-protect's cleanup form:
       ;; if error, shut down gracefully.

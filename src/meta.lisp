@@ -4,12 +4,13 @@
 ;; DATA [STRING] --> STRING
 (defun journal (data &optional (name "unnamed"))
   "Print out a piece of data for logging on stdout."
-
   (format t "~A | ~A~%" (force-string-length name 10)  data))
 
 
 (defun standard-journaling ())
 
+
+;; -------------------------------------
 
 
 ;; LIST --> STRING
@@ -18,7 +19,7 @@
 
   (if bytes
     (format t "~A"
-	    (ignore-errors (trivial-utf-8:utf-8-bytes-to-string bytes)))))
+	    (ignore-errors (tu8:utf-8-bytes-to-string bytes)))))
 
 
 ;; STRING NUMBER [STRING} --> STRING

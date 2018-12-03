@@ -11,42 +11,83 @@
   (random 999999))
 
 ;; STRING --> STRING
-(defun make-client-input-id (client-id)
+(defun client-data-id (client-id data)
   "Make an 'input ID' from a client-id."
-  (format nil "~A-input" client-id))
+  (format nil "~A-~A" client-id data))
 
-(defun make-client-output-id (client-id)
-  "Make an 'output ID' from a client-id."
-  (format nil "~A-output" client-id))
+
+;; -------------------------------------
+
+
+;; SOCKET --> NUMBER
+(defun socket-to-client (socket)
+  "Return the client of a socket."
+  (cadr (socket-pair socket)))
+
+
+;; NUMBER --> SOCKET
+(defun client-to-socket (client)
+  "Return the socket of a client."
+  (car (client-pair client)))
+
+
+
+;; NUMBER --> LIST
+(defun client-pair (client)
+  "Return the '(socket client) pair of a client."
+  (nih:getf-cadr *socket-client* client))
+
+
+;; SOCKET --> LIST
+(defun socket-pair (socket)
+  "Return the '(socket client) pair of a socket."
+  (nih:getf-car *socket-client* socket))
+
+
+;; -------------------------------------
+
+
+;; NUMBER STRING DATA --> NIL
+(defun client-data-set (client data value)
+  "Set a piece of a `client`'s `data` to `value`."
+
+  (setf
+    (gethash (client-data-id client data) *client-data*)
+    value))
+
+
+;; NUMBER STRING --> ???
+(defun client-data-get (client data)
+  "Get the value of a client's `data` from *client-data*."
+  (gethash (client-data-id client data) *client-data*))
+
+
+;; NUMBER STRING --> NIL
+(defun client-data-rem (client data)
+  "Remove a piece of client's `data` from *client-data*."
+  (remhash (client-data-id client data) *client-data*))
 
 
 ;; -------------------------------------
 
 
 ;; SOCKET --> NIL
-(defun client-register (socket)
-  "Register a new client; add their data to globals, log it, etc."
+(defun socket-register (socket)
+  "Register a new socket; add their data to globals, log it, etc."
 
-  (let* ((client-id (make-client-id))
-	 (socket-id (make-socket-id socket))
-	 (output-id (make-client-output-id client-id))
-	 (input-id (make-client-input-id client-id)))
+  (let* ((client-id (make-client-id)))
 
     (setq *socket-list* (concatenate 'list *socket-list* (list socket)))
-    (setq *client-socket-list* (concatenate 'list *client-socket-list*
-					    (list socket)))
 
+    (setq *socket-client* (concatenate 'list *socket-client*
+				       (list (list socket client-id))))
+    (setq *csocket-list* (concatenate 'list *csocket-list*
+				      (list socket)))
     (setq
-      *client-list*
-      (concatenate 'list *client-list* (list client-id)))
-    (setf
-      (gethash client-id *client-pairs*) socket-id)
-    (setf
-      (gethash socket-id *socket-pairs*) client-id)
-    (setf
-      (gethash output-id *client-data*) '())
-    (setf
-      (gethash input-id *client-data*) '())
+      *client-list* (concatenate 'list *client-list*
+				 (list client-id)))
+
+    (client-data-set client-id "input" '())
 
     (journal (format nil "Client ~A has connected!" client-id) "Connect")))
 
@@ -54,21 +95,23 @@
 ;; -------------------------------------
 
 
-(defun client-slaughter (socket)
+;; NUMBER --> NIL
+(defun client-slaughter (client)
+  "Clean up data from client, and disconnect their socket."
+  (socket-slaughter (client-to-socket client)))
+
+
+;; SOCKET --> NIL
+(defun socket-slaughter (socket)
   "Clean up data from a client, and disconnect their socket."
 
-  (let* ((socket-id (make-socket-id socket))
-	 (client-id (gethash socket-id *socket-pairs*))
-	 (output-id (make-client-output-id client-id))
-	 (input-id (make-client-input-id client-id)))
+  (let* ((client-id (socket-to-client socket)))
 
-    (remhash socket-id *socket-pairs*)
-    (remhash client-id *client-pairs*)
-    (remhash client-id *client-data*)
-    (remhash input-id *client-data*)
-    (setq *client-list* (delete client-id *client-list*))
+    (client-data-rem client-id "input")
+    (setq *socket-client* (delete (socket-pair socket) *socket-client*))
     (setq *socket-list* (delete socket *socket-list*))
-    (setq *client-socket-list* (delete socket *client-socket-list*))
+    (setq *client-list* (delete client-id *client-list*))
+    (setq *csocket-list* (delete socket *csocket-list*))
 
     (usocket:socket-close socket)
     (journal

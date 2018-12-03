@@ -4,7 +4,7 @@
 (defun connect-ex (socket client-id)
   "Example connection handler-- sends a friendly welcome message!"
 
-  (client-write socket
+  (client-write client-id
 		(format nil "Hey, welcome to this server, ~A! <3" client-id)
 		'T))
 
@@ -30,7 +30,7 @@
 	       (format nil "Sorry, I didn't hear that quite right.~%")
 	       (format nil "Did you say, \"~A?\"" reversed-input))))
 
-      (client-write socket output-string 'T))))
+      (client-write client-id output-string 'T))))
 
 
 (defun halt-ex ()
