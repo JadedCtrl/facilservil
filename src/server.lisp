@@ -48,7 +48,7 @@
   (let* ((master-socket
 	   (usocket:socket-listen host port
 				  :reuse-address 'T
-				  :element-type 'unsigned-byte )))
+				  :element-type '(unsigned-byte 8))))
     (reset-globals)
     (setq *socket-list* (list master-socket))
 
@@ -79,7 +79,6 @@
 		    (let* ((client-id (socket-to-client socket))
 			   (client-bytes (client-data-get client-id "input"))
 			   (client-input (client-input-string client-id)))
-		      (journal client-input "Client Input")
 
 		      ;; if reached *command-byte*, handle and flush input
 		      (if (commandp client-bytes command-byte)

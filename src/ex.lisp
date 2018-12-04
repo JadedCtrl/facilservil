@@ -21,7 +21,7 @@
 (defun input-handle-ex (socket client-id input-string)
   "Example input-handler. Reverses user input and sends it back at them!"
 
-  (if input-string
+  (if (< 0 (length input-string))
     (let* ((reversed-input
 	     (nih:char-string (reverse (nih:char-list input-string))))
 
