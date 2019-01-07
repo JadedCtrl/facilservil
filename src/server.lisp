@@ -30,7 +30,7 @@
 ;; STRING NUMBER CHARACTER FUNCTION-NAME FUNCTION-NAME FUNCTION-NAME --> NIL
 (defun server
   (host port connecting disconnecting input-handler
-	&key (command-byte 10) (halting 'halt-ex))
+	&key (command-byte 10) (halting 'halt-ex) (init 'blank))
 
   "Runs the basic server on `host`:`port`, running `connecting` when a new
   client connects, `disconnecting` when one disconnects, and `input-handler`
@@ -52,6 +52,8 @@
     (reset-globals)
     (setq *socket-list* (list master-socket))
 
+    (funcall init)
+
     (unwind-protect
       (loop 
 	(loop
@@ -72,7 +74,7 @@
 
 
 	    ;; ...if functioning old connection...
-	    ((listen (usocket:socket-stream socket))
+	    ((socket-connectp socket)
 	     (progn (socket-read socket)
 		    ;; check if command is complete-- if so, use user-provided
 		    ;; input-handler.
@@ -128,3 +130,6 @@
   (server host port connecting disconnecting input-handler
 	  :command-byte command-byte
 	  :halting halting))
+
+
+(defun blank ())

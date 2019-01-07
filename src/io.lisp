@@ -11,7 +11,6 @@
 
   (let* ((client-id   (socket-to-client socket))
 	 (input-stack (client-data-get client-id "input")))
-
     (client-data-set
       client-id "input"
       (concatenate 'list input-stack
@@ -24,7 +23,6 @@
 
   (let ((sstream (usocket:socket-stream socket))
 	(i 0))
-
     (loop
       :while (< i (length bytes))
       :do
@@ -43,11 +41,12 @@
 
   (socket-write-bytes
     socket
-    (babel:string-to-octets
-      (if line-break
-	(format nil "~A~%" string)
-	string)
-      :encoding :utf-8)))
+    (ignore-errors
+      (babel:string-to-octets
+	(if line-break
+	  (format nil "~A~%" string)
+	  string)
+	:encoding :utf-8))))
 
 
 ;; STRING [BOOLEAN] [SOCKET] --> NIL
@@ -138,6 +137,14 @@
 	      :initial-contents list
 	      :element-type '(unsigned-byte 8)))
 
+
+;; -------------------------------------
+
+;; SOCKET --> BOOLEAN
+(defun socket-connectp (socket)
+  "Return whether or not a socket is still connected."
+  (listen (usocket:socket-stream socket)))
+
 ;; -------------------------------------
 ;; MISC.
 
@@ -159,13 +166,3 @@
     (eq command-byte last-byte)))
 
 
-;; STRING STRING
-(defun strequal (str1 str2)
-  "Returns whether or not strings are equal-- in their UTF bytes."
-
-  (let ((str1-u
-	  (delete 0 (tu8:string-to-utf-8-bytes str1 :encoding :utf-8)))
-	(str2-u
-	  (delete 0 (tu8:string-to-utf-8-bytes str2 :encoding :utf-8))))
-
-    (equalp str1-u str2-u)))
