@@ -160,22 +160,22 @@
 
 ;; —————————————————
 
-(defgeneric close-it (target con-list on-disconnect)
+(defgeneric close-it (target &optional con-list on-disconnect)
   (:documentation "Shut down a target's connection, forcefully.
                   Run the disconnect function as well."))
 
 ;; CONNECTION LIST-OF-CONNECTIONS FUNCTION
-(defmethod close-it ((con connection) connection-list on-disconnect)
-  (close (con→stream con) connection-list on-disconnect))
+(defmethod close-it ((con connection) &optional connection-list on-disconnect)
+  (close-it (con→socket con) connection-list on-disconnect))
 
 ;; STREAM-USOCKET LIST-OF-CONNECTIONS FUNCTION
-(defmethod close-it ((socket usocket:stream-usocket) connection-list on-disconnect)
-  (funcall on-disconnect socket connection-list)
+(defmethod close-it ((socket usocket:stream-usocket) &optional connection-list on-disconnect)
+  (when connection-list (funcall on-disconnect socket connection-list))
   (handler-case
       (usocket:socket-close socket)
     (error (e)
       (logger "Ignoring the error from closing connection: ~a" e)))
-  (logger "Connection closed: ~A" con))
+  (logger "Connection closed: ~A" socket))
 
 ;; —————————————————
 
