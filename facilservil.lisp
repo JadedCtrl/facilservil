@@ -1,11 +1,10 @@
 ;; facilservil.lisp
-;; A simple lib for making a TCP server.
-;; Based on a server by Trout,
+;; Based on a server by Traut,
 ;; https://gist.github.com/traut/6bf71d0da54493e6f22eb3d00671f2a9
 ;; which is in turn inspired by
-; https://gist.github.com/shortsightedsid/71cf34282dfae0dd2528
-; https://gist.github.com/shortsightedsid/a760e0d83a9557aaffcc
-; http://mihai.bazon.net/blog/howto-multi-threaded-tcp-server-in-common-lisp
+;; https://gist.github.com/shortsightedsid/71cf34282dfae0dd2528
+;; https://gist.github.com/shortsightedsid/a760e0d83a9557aaffcc
+;; http://mihai.bazon.net/blog/howto-multi-threaded-tcp-server-in-common-lisp
 
 (defpackage :facilservil
   (:use :cl)

@@ -6,20 +6,18 @@ Sometimes, it's just annoying and time-draining to deal with all of the
 intricacies of :usockets— facilservil abstracts away all of those bits.
 
 
-----------------------------------------
+————————————————————————————————————————
 FEATURES
-----------------------------------------
-
+————————————————————————————————————————
  * Multi-threaded
  * Input-handling
  * Logging system
  * UTF-8
 
 
-----------------------------------------
+————————————————————————————————————————
 DEMONSTRATION
-----------------------------------------
-
+————————————————————————————————————————
 Load up Facilservil, then run this in your repl:
     
        (facilservil:ex-server "localhost" 8888)
@@ -48,11 +46,9 @@ input), look at QOTDD (https://git.eunichx.us/qotdd).
 For a more comprehensive guide to Facilservil, look to USAGE, coming right up.
 
 
-
-----------------------------------------
+————————————————————————————————————————
 USAGE
-----------------------------------------
-
+————————————————————————————————————————
 To use Facilservil, just use the `facilservil:server` function somewhere.
 
 "host" and "port" are, obviously, the host-IP and port, respectively.
@@ -79,10 +75,10 @@ whatever you need). You can store/set a variable with #'bury, and retrieve with
 #'dig.
 
 
-
-----------------------------------------
+————————————————————————————————————————
 BORING STUFF
-----------------------------------------
-Based on Trout's server.
+————————————————————————————————————————
+Based on Sergey's gist <sergey@polzunov.com>
 Author is Jaidyn Ann <jadedctrl@teknik.io>
+License is BSD 3-Clause “New”, see COPYING.txt
 Sauce is at https://git.eunichx.us/facilservil.git
