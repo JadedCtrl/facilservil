@@ -41,7 +41,7 @@ everyone's input (or after timeout of waiting for input).
 
 
 For a different kind of example (less interesting, since it takes no user
-input), look at QOTDD (https://git.eunichx.us/qotdd).
+input), look at QOTDD (https://hak.xwx.moe/jadedctrl/qotdd).
 
 For a more comprehensive guide to Facilservil, look to USAGE, coming right up.
 
@@ -79,6 +79,6 @@ whatever you need). You can store/set a variable with #'bury, and retrieve with
 BORING STUFF
 ————————————————————————————————————————
 Based on Sergey's gist <sergey@polzunov.com>
-Author is Jaidyn Ann <jadedctrl@teknik.io>
+Author is Jaidyn Ann <jadedctrl@posteo.at>
 License is BSD 3-Clause “New”, see COPYING.txt
-Sauce is at https://git.eunichx.us/facilservil.git
+Sauce is at https://hak.xwx.moe/jadedctrl/facilservil
